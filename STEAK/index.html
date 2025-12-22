@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<head>
+    <title>Jacobs Steak Tracking</title>
+</head>
+<body>
+    <div class="parent">
+        <div class="new">
+            <header>New Steak</header>
+            <form id="Steak-form" enctype="multipart/form-data" onsubmit="steak_to_add()">
+            <div>
+                <label for="Steak-cost">Steak Cost in £:</label>
+                <input type="number" id="Steak-cost" name="Steak-cost" step="any">
+
+                <br>
+
+                <label for="Steak-weight">Steak weight in Grams:</label>
+                <input type="number" id="Steak-weight" name="Steak-weight" step="any">
+
+                <br>
+
+                <label for="Steak-type">Steak Type:</label>
+                <select class="i" id="Steak-type" name="Steak-type"></select>
+
+                <br>
+
+                <div id="camera-area">
+                    <video id="video" autoplay playsinline style="max-width:320px; display:none;"></video>
+                    <canvas id="canvas" style="display:none;"></canvas>
+                    <div>
+                        <button type="button" id="open-camera">Open Camera</button>
+                        <button type="button" id="capture" style="display:none;">Capture Photo</button>
+                        <button type="button" id="flip-camera" style="display:none;">Flip Camera</button>
+                        <button type="button" id="close-camera" style="display:none;">Close Camera</button>
+                    </div>
+                    <div id="upload-status" style="margin-top:8px;font-size:0.9rem;color:green"></div>
+                </div>
+
+                <br>
+
+                <button type="submit" id="add-Steak-btn">Add Steak</button>
+            </div>
+            </form>
+        </div>
+        <div class="log">
+            <header>Your Steak Logs</header>
+        </div>
+    </div>
+    <script src="app.js"></script>
+    <script src="camera.js"></script>
+</body>
+
+<style>
+    .parent {
+        display: grid;
+        grid-template-columns: repeat(2,1fr);
+        grid-template-rows: repeat(1,1fr);
+        grid-column-gap: 0px;
+        grid-row-gap: 0px;
+    }
+
+    .i {font-style: italic;}
+</style>
