@@ -15,18 +15,59 @@ async function steak_to_add(e) {
     const weight = document.getElementById('Steak-weight').value;
 
     if (!steakCost || !steakType || !weight) return;
-
-    const logDiv = document.querySelector('.log');
-    const newLogEntry = document.createElement('div');
-    const photoName = window.lastUploadedFilename || '';
-    newLogEntry.textContent = `type:${steakType},cost:£${steakCost},weight:${weight}g, date:${new Date().toLocaleDateString()}, time:${new Date().toLocaleTimeString()}${photoName ? ',photo:' + photoName : ''}`;
-    logDiv.appendChild(newLogEntry);
-    logDiv.appendChild(document.createElement('img')).src = photoName ? `/uploads/${photoName}` : '';
-    document.getElementById('Steak-cost').value = '';
-    document.getElementById('Steak-weight').value = '';
-    window.lastUploadedFilename = null;
-
-    console.log('Steak added:', newLogEntry.textContent);
+    // send data to server which will insert into SQLite DB
+    const payload = {
+        type: steakType,
+        cost: parseFloat(steakCost),
+        weight: parseFloat(weight),
+        photo: window.lastUploadedFilename || null
+    };
+    try {
+        const res = await fetch('/add_steak', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error(res.statusText || res.status);
+        const saved = await res.json();
+        appendLogEntry(saved);
+        document.getElementById('Steak-cost').value = '';
+        document.getElementById('Steak-weight').value = '';
+        window.lastUploadedFilename = null;
+    } catch (err) {
+        console.error('Add steak failed', err);
+    }
 }
 
-//document.getElementById('add-Steak-btn').addEventListener('click', steak_to_add);
+// Attach form submit handler to prevent page reload
+const steakForm = document.getElementById('Steak-form');
+if (steakForm) steakForm.addEventListener('submit', steak_to_add);
+
+function appendLogEntry(entry) {
+    const logDiv = document.querySelector('.log');
+    const newLogEntry = document.createElement('div');
+    newLogEntry.textContent = `type:${entry.type},cost:£${entry.cost},weight:${entry.weight}g, date:${entry.timestamp}`;
+    logDiv.appendChild(newLogEntry);
+    if (entry.photo) {
+        const img = document.createElement('img');
+        img.src = `/uploads/${entry.photo}`;
+        img.style.maxWidth = '200px';
+        img.style.display = 'block';
+        logDiv.appendChild(img);
+    }
+}
+
+// load existing steaks on page load
+async function loadSteaks() {
+    try {
+        const res = await fetch('/steaks');
+        if (!res.ok) throw new Error(res.statusText || res.status);
+        const list = await res.json();
+        list.reverse(); // oldest first
+        list.forEach(appendLogEntry);
+    } catch (err) {
+        console.error('Failed to load steaks', err);
+    }
+}
+
+window.addEventListener('DOMContentLoaded', loadSteaks);
