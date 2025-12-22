@@ -3,10 +3,26 @@
     <title>Jacobs Steak Tracking</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="static/styles.css">
+        <link rel="stylesheet" type="text/css" href="static/styles.css">
 </head>
 <body>
-    <div class="parent">
+        <div class="page-shell">
+        <header class="site-header fade-in">
+            <div class="brand">
+                <div class="logo" aria-hidden="true"></div>
+                <div>
+                    <div class="site-title">Jacob's Steak Tracker</div>
+                    <div class="site-sub">Quick mobile steak logging</div>
+                </div>
+            </div>
+            <div class="controls">
+                <button class="btn secondary" id="help">Help</button>
+                <button class="btn" id="new-log">New</button>
+            </div>
+        </header>
+
+        <main class="container">
+        <div class="parent">
         <div class="new">
             <header>New Steak</header>
             <form id="Steak-form" enctype="multipart/form-data">
@@ -48,8 +64,9 @@
             <header>Your Steak Logs</header>
         </div>
     </div>
-    <script src="app.js"></script>
-    <script src="camera.js"></script>
+    <script type="module" src="static/app.module.js"></script>
+    <script src="app.js" defer></script>
+    <script src="camera.js" defer></script>
 </body>
 
 <style>

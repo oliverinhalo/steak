@@ -123,7 +123,7 @@ def add_steak():
     return jsonify(steak)
 
 
-# db.delete_all()  # Clear existing data on startup for testing   
+#db.delete_all()  # Clear existing data on startup for testing   
 if __name__ == '__main__':
     ip = 'localhost'
     port = 8000

@@ -125,3 +125,32 @@ textarea{min-height:90px;resize:vertical}
 /* Footer */
 .site-footer{margin-top:28px;color:var(--muted);font-size:0.85rem;text-align:center}
 
+/* Motion & micro-interactions */
+.fade-in{animation:fadeIn .6s ease both}
+.slide-up{animation:slideUp .55s cubic-bezier(.2,.9,.25,1) both}
+.pulse{animation:pulse .9s infinite cubic-bezier(.4,0,.6,1)}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(255,107,53,0.12)}70%{box-shadow:0 12px 30px -8px rgba(0,0,0,0.6)}100%{box-shadow:0 0 0 0 rgba(255,107,53,0.0)}}
+
+/* Floating background for 404 */
+.bg-canvas{position:fixed;inset:0;pointer-events:none;z-index:0}
+.page-shell{position:relative;z-index:1}
+
+/* Mobile-first tweaks */
+@media (max-width:520px){
+	:root{--radius:12px}
+	.logo{width:44px;height:44px}
+	.site-title{font-size:1.0rem}
+	.photo img{height:180px}
+	.btn{padding:12px 16px;border-radius:12px}
+}
+
+/* 404 specific */
+.notfound-wrap{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+.notfound-h1{font-size:2.2rem;margin:8px 0}
+.notfound-sub{color:var(--muted);max-width:320px}
+.notfound-actions{margin-top:18px;display:flex;gap:12px}
+
+
