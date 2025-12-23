@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, redirect
 import os
 import sqlite3
 import uuid
@@ -121,6 +121,20 @@ def add_steak():
         'timestamp': row[5]
     }
     return jsonify(steak)
+
+@app.route('/ping', methods=['GET'])
+def ping():
+    hostname = socket.gethostname()
+    ip_address = socket.gethostbyname(hostname)
+    return jsonify(message='pong', hostname=hostname, ip_address=ip_address)
+
+@app.route('/reset_db')
+def reset_db():
+    db.delete_all()
+    os.remove('steak.db')
+    os.remove(UPLOADS)
+    os.makedirs(UPLOADS, exist_ok=True)
+    return redirect('/')
 
 
 #db.delete_all()  # Clear existing data on startup for testing   

@@ -53,6 +53,10 @@
       window.lastUploadedFilename = data.filename;
       statusDiv.style.color = 'green';
       statusDiv.textContent = 'Uploaded';
+      // show uploaded image in preview and close camera
+      const preview = document.getElementById('preview-img');
+      if(preview){ preview.src = `/uploads/${data.filename}`; preview.style.display = 'block'; }
+      closeCamera();
       return data;
     } catch (err) {
       console.error('Upload error', err);
