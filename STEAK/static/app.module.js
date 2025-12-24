@@ -79,6 +79,70 @@ function init404Canvas(){
   loop();
 }
 
+function initSteakSnow(){
+  if(prefs.prefersReducedMotion) return;
+  const canvas = document.createElement('canvas');
+  canvas.className = 'bg-canvas';
+  document.body.prepend(canvas);
+  const ctx = canvas.getContext('2d');
+  let w, h, DPR = window.devicePixelRatio || 1;
+  const particles = [];
+
+  function resize(){
+    w = Math.floor(innerWidth * DPR);
+    h = Math.floor(innerHeight * DPR);
+    canvas.width = w; canvas.height = h;
+    canvas.style.width = innerWidth + 'px';
+    canvas.style.height = innerHeight + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+  window.addEventListener('resize', resize); resize();
+
+  const EMOJI = '🥩';
+
+  function spawn(){
+    const size = 18 + Math.random() * 44; // px
+    particles.push({
+      x: Math.random() * (w/DPR),
+      y: -20 - Math.random() * 400,
+      vy: 0.5 + Math.random() * 1.2,
+      rot: (Math.random() - 0.5) * 0.6,
+      vr: (Math.random() - 0.5) * 0.02,
+      size: size,
+      sway: (Math.random() - 0.5) * 0.6
+    });
+  }
+
+  // initial batch scaled for performance on mobile
+  const initial = Math.min(60, Math.max(20, Math.floor((innerWidth/360) * 30)));
+  for(let i=0;i<initial;i++) spawn();
+
+  function loop(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for(let i=particles.length-1;i>=0;i--){
+      const p = particles[i];
+      p.y += p.vy;
+      p.x += Math.sin((p.y + p.x) * 0.005) * 0.6 + p.sway;
+      p.rot += p.vr;
+
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot);
+      ctx.font = `${p.size}px serif`;
+      ctx.fillText(EMOJI, 0, 0);
+      ctx.restore();
+
+      if(p.y - p.size > (h/DPR) + 60){
+        particles.splice(i,1);
+        spawn();
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+}
+
 function init(){
   headerEntrance();
   hookButtons();
@@ -93,6 +157,8 @@ function init(){
   if(document.body.classList.contains('page-404')){
     init404Canvas();
   }
+  // default background: floating steaks
+  initSteakSnow();
 }
 
 // run when DOM ready

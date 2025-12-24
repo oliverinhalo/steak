@@ -19,6 +19,7 @@
                                 <div id="login-area">
                                     <span id="who" class="muted">Not signed in</span>
                                     <button class="btn secondary" id="btn-show-login">Sign In</button>
+                                    <button class="btn secondary" id="btn-logout" style="display:none;">Logout</button>
                                 </div>
                                 <button class="btn" id="new-log">New</button>
             </div>
@@ -37,6 +38,12 @@
 
                 <label for="Steak-weight">Steak weight in Grams:</label>
                 <input type="number" id="Steak-weight" name="Steak-weight" step="any">
+
+                <br>
+                
+                <label for="Steak-cook">Steak Cook Level:</label>
+                <select class="i" id="Steak-cook" name="Steak-cook"></select>
+            
 
                 <br>
 
@@ -82,10 +89,7 @@
             <div style="display:flex;flex-direction:column;gap:8px">
                 <label class="muted">Choose username</label>
                 <select id="user-list" style="padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.05)"></select>
-                <label class="muted">Display name (optional)</label>
-                <input id="register-name" type="text" placeholder="Your name" style="padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.05)">
-                <label class="muted">Email (optional)</label>
-                <input id="register-email" type="email" placeholder="you@example.com" style="padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.05)">
+                <!-- removed display name and email inputs per request -->
                 <label class="muted">Password</label>
                 <input id="login-pass" type="password" placeholder="password" style="padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.05)">
                 <div style="display:flex;gap:8px;justify-content:flex-end">
@@ -99,6 +103,7 @@
             (function(){
                 const who = document.getElementById('who');
                 const btnShow = document.getElementById('btn-show-login');
+                const btnLogout = document.getElementById('btn-logout');
                 const modal = document.getElementById('login-modal');
                 const userList = document.getElementById('user-list');
                 const passInput = document.getElementById('login-pass');
@@ -106,9 +111,9 @@
                 const btnRegister = document.getElementById('btn-register');
                 const btnCancel = document.getElementById('login-cancel');
 
-                function setUser(id){ localStorage.setItem('user_id', id); who.textContent = 'Signed as ' + id; }
+                function setUser(id){ localStorage.setItem('user_id', id); who.textContent = 'Signed as ' + id; document.getElementById('new-log').style.display='inline-block'; btnLogout.style.display='inline-block'; btnShow.style.display='none'; }
                 const existing = localStorage.getItem('user_id');
-                if(existing) who.textContent = 'Signed as ' + existing;
+                if(existing){ who.textContent = 'Signed as ' + existing; document.getElementById('new-log').style.display='inline-block'; btnLogout.style.display='inline-block'; btnShow.style.display='none'; } else { document.getElementById('new-log').style.display='none'; }
 
                 async function refreshUsers(){
                     try{
@@ -124,12 +129,22 @@
                 btnShow.addEventListener('click', async ()=>{ await refreshUsers(); passInput.value=''; modal.style.display='block'; passInput.focus(); });
                 btnCancel.addEventListener('click', ()=>{ modal.style.display='none'; });
 
+                btnLogout.addEventListener('click', async ()=>{
+                    try{ await fetch('/logout',{method:'POST'}); }catch(e){}
+                    localStorage.removeItem('user_id');
+                    who.textContent = 'Not signed in';
+                    btnLogout.style.display='none';
+                    btnShow.style.display='inline-block';
+                    document.getElementById('new-log').style.display='none';
+                    location.reload();
+                });
+
                 btnLogin.addEventListener('click', async ()=>{
                     const username = userList.value || prompt('Enter username');
                     const password = passInput.value;
                     if(!username || !password){ alert('Provide username and password'); return; }
                     try{
-                        const r = await fetch('/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password})});
+                        const r = await fetch('/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password}), credentials: 'same-origin'});
                         if(!r.ok) { const j=await r.json().catch(()=>({})); throw new Error(j.error||r.statusText||'Login failed'); }
                         const j = await r.json(); setUser(j.user); modal.style.display='none'; location.reload();
                     }catch(e){ alert('Login failed: '+(e.message||e)); }
@@ -138,11 +153,9 @@
                 btnRegister.addEventListener('click', async ()=>{
                     const username = userList.value || prompt('Choose a username');
                     const password = passInput.value || prompt('Choose a password');
-                    const name = document.getElementById('register-name').value || '';
-                    const email = document.getElementById('register-email').value || '';
                     if(!username || !password){ alert('Provide username and password'); return; }
                     try{
-                        const r = await fetch('/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password,name,email})});
+                        const r = await fetch('/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password}), credentials: 'same-origin'});
                         if(!r.ok){ const j=await r.json().catch(()=>({})); throw new Error(j.error||r.statusText||'Register failed'); }
                         const j = await r.json(); setUser(j.user); modal.style.display='none'; location.reload();
                     }catch(e){ alert('Register failed: '+(e.message||e)); }

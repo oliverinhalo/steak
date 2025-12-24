@@ -1,6 +1,9 @@
 const steak_types = ["Tomahawk Steak", "Ribeye Steak", "Sirloin Steak", "T-Bone Steak", "Filet", "other"];
 const selectElement = document.getElementById('Steak-type');
 
+const cook_levels = ["Rare", "Medium Rare", "Medium", "Medium Well", "Well Done"];
+const cookSelect = document.getElementById('Steak-cook');
+
 for (let i = 0; i < steak_types.length; i++) {
     const option = document.createElement('option');
     option.value = steak_types[i];
@@ -8,10 +11,18 @@ for (let i = 0; i < steak_types.length; i++) {
     selectElement.appendChild(option);
 }
 
+for (let i = 0; i < cook_levels.length; i++) {
+    const option = document.createElement('option');
+    option.value = cook_levels[i];
+    option.textContent = cook_levels[i];
+    cookSelect.appendChild(option);
+}
+
 async function steak_to_add(e) {
     if (e && e.preventDefault) e.preventDefault();
     const steakCost = document.getElementById('Steak-cost').value;
     const steakType = document.getElementById('Steak-type').value;
+    const cookLevel = document.getElementById('Steak-cook').value;
     const weight = document.getElementById('Steak-weight').value;
 
     if (!steakCost || !steakType || !weight) return;
@@ -20,6 +31,7 @@ async function steak_to_add(e) {
     const payload = {
         user: user,
         type: steakType,
+        cook: cookLevel,
         cost: parseFloat(steakCost),
         weight: parseFloat(weight),
         photo: window.lastUploadedFilename || null
@@ -28,7 +40,8 @@ async function steak_to_add(e) {
         const res = await fetch('/add_steak', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload),
+            credentials: 'same-origin'
         });
         if (!res.ok) throw new Error(res.statusText || res.status);
         const saved = await res.json();
@@ -73,7 +86,7 @@ function appendLogEntry(entry) {
             const id = newLogEntry.dataset.id;
             const user = localStorage.getItem('user_id') || 'anonymous';
             try{
-                const r = await fetch(`/steak/${id}`, { method: 'DELETE', headers: { 'x-user-id': user } });
+                const r = await fetch(`/steaks/${id}`, { method: 'DELETE', headers: { 'x-user-id': user }, credentials: 'same-origin' });
                 if(!r.ok) throw new Error(r.statusText||r.status);
                 newLogEntry.remove();
             }catch(e){console.error('Delete failed',e);alert('Delete failed');}
@@ -85,8 +98,13 @@ function appendLogEntry(entry) {
 // load existing steaks on page load
 async function loadSteaks() {
     try {
-        const user = localStorage.getItem('user_id') || 'anonymous';
-        const res = await fetch('/steaks', { headers: { 'x-user-id': user } });
+        const user = localStorage.getItem('user_id');
+        const logContainer = document.getElementById('log-entries') || document.querySelector('.log');
+        if(!user){
+            if(logContainer) logContainer.innerHTML = '<div class="muted">Please sign in to view logs.</div>';
+            return;
+        }
+        const res = await fetch('/steaks', { headers: { 'x-user-id': user }, credentials: 'same-origin' });
         if (!res.ok) throw new Error(res.statusText || res.status);
         const list = await res.json();
         list.reverse(); // oldest first

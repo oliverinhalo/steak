@@ -3,7 +3,7 @@ a way to track eating steaks.
 
 # 🥩 Steak Tracker
 
-A sleek and simple **steak tracking system** for monitoring **weight, cost, photos, and steak type**.  
+A sleek and simple **steak tracking system** for monitoring **weight, cost, cook, photos, and steak type**.  
 Built to help track value, quality, and changes over time — whether you're logging supermarket steaks or premium cuts.
 
 ---
@@ -12,6 +12,7 @@ Built to help track value, quality, and changes over time — whether you're log
 
 - 📸 **Photo logging** – attach images to each steak entry  
 - ⚖️ **Weight tracking** – record weight before / after trimming or cooking  
+- 🔥 **Cook data** - recored how cooked it was
 - 💷 **Cost analysis** – price per steak and price per kg  
 - 🥩 **Steak type** – ribeye, sirloin, rump, fillet, and more  
 - 📊 **Data-focused** – perfect for comparisons and trends over time  
@@ -36,6 +37,7 @@ Steak Tracker turns steak buying into **data**.
 | `type` | Steak cut (e.g. Ribeye, Sirloin) |
 | `weight` | Weight in grams |
 | `cost` | Purchase price |
+| 'cook' | cook type (rare, well done) |
 | `price_per_kg` | Automatically calculated |
 | `photo` | Image of the steak |
 | `date` | Date logged |
@@ -58,6 +60,7 @@ Steak Tracker turns steak buying into **data**.
   "type": "Ribeye",
   "weight_g": 420,
   "cost_gbp": 6.50,
+  "cook": "median rare",
   "price_per_kg": 15.48,
   "photo": "ribeye_2025-01-12.jpg",
   "date": "2025-01-12"
